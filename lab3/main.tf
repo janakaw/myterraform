@@ -1,6 +1,6 @@
 # Configure the AWS Provider
 provider "aws" {
-  region = "ap-southeast-2"
+  region = "ap-southeast-1"
 }
 
 #Retrieve the list of AZs in the current AWS region
@@ -116,29 +116,27 @@ resource "aws_nat_gateway" "nat_gateway" {
   }
 }
 
-# Terraform Data Block - To Lookup Latest Ubuntu 20.04 AMI Image
-data "aws_ami" "ubuntu" {
-  most_recent = true
+resource "aws_security_group" "allow_tls" {
+  name        = "allow_tls"
+  description = "Allow TLS inbound traffic and all outbound traffic"
+  vpc_id      = aws_vpc.vpc.id
 
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["099720109477"]
-}
-
-# Terraform Resource Block - To Build EC2 instance in Public Subnet
-resource "aws_instance" "web_server" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  subnet_id     = aws_subnet.public_subnets["public_subnet_1"].id
   tags = {
-    Name = "Ubuntu EC2 Server"
+    Name = "allow_tls"
   }
 }
+
+resource "aws_instance" "web" {
+  ami = "ami-0d07675d294f17973"
+  instance_type = "t3.micro"
+
+  subnet_id = aws_subnet.public_subnets["public_subnet_1"].id
+  vpc_security_group_ids = [ aws_security_group.allow_tls.id ]
+
+  tags = {
+  "terraform" = "true"
+  }
+}
+
+
+
