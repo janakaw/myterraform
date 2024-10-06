@@ -308,3 +308,14 @@ module "autoscaling" {
   instance_type = "t3.micro"
 
 }
+
+module "test-s3-bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "2.11.1"
+}
+
+output "s3_bucket_name" {
+  value = module.test-s3-bucket.s3_bucket_bucket_domain_name
+}
+
+
