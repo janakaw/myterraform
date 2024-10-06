@@ -1,6 +1,12 @@
 # Configure the AWS Provider
 provider "aws" {
   region = "ap-southeast-2"
+  default_tags {
+    tags = {
+      Environment = terraform.workspace
+      Owner       = "js"
+    }
+  }
 }
 
 #Retrieve the list of AZs in the current AWS region
@@ -268,6 +274,11 @@ resource "aws_instance" "ubuntu_server" {
     ignore_changes = [security_groups]
   }
 
+}
+
+resource "aws_instance" "aws_linux_import" {
+  ami           = "ami-0e8fd5cc56e4d158c"
+  instance_type = "t2.micro"
 }
 
 resource "aws_instance" "aws_import_lab" {
